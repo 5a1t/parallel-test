@@ -19,6 +19,8 @@ int main(int argc, char **argv)
 	MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
 	MPI_Comm_rank(MPI_COMM_WORLD,&myid);
 
+//pipeline method
+if(PIPELINE == 1){
 	int i;
 	for(i = 0; i <= POWER/numprocs; i++){
 	//start ball rolling
@@ -41,7 +43,14 @@ int main(int argc, char **argv)
 		}	
 		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+1)%numprocs, 0, MPI_COMM_WORLD);
 	}
-	}	
+	}
+}
+//divide and conquer method.
+else{
+	MPI_Bcast(data, 2, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
+	
+
+}	
 MPI_Finalize();	
 return 0;
 }
