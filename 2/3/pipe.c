@@ -10,8 +10,9 @@
 int main(int argc, char **argv)
 {
 	int myid, numprocs;
-	int[2] data = {0};
-	data[0] = atoi(argv[0]);
+	long long int data[2];
+	long long int mult = atoll(argv[1]);
+	data[0] = mult;
 	data[1] = 1;
 
 	MPI_Init(&argc,&argv);
@@ -22,26 +23,26 @@ int main(int argc, char **argv)
 	for(i = 0; i <= POWER/numprocs; i++){
 	//start ball rolling
 	if (myid == 0) {
-		data[0] = data[0] * data[0];
-		data[1] ++;
+		if(i > 0){
+		//not the first time around, wait for response.
+		    MPI_Recv(data, 2, MPI_LONG_LONG_INT, numprocs, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		}
+		data[0] = data[0] * mult;
+		data[1] = data[1] + 1;
 		//send data to each processor
-		MPI_Send(data, 2, MPI_INT, (myid+1)%numprocs, 0, MPI_COMM_WORLD);
+		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+1)%numprocs, 0, MPI_COMM_WORLD);
 	}
 	else{
-		MPI_Recv(data, 2, MPI_INT, myid-1, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-		data[0] = data[0] * data[0];
-		MPI_Send(data, 2, MPI_INT, (mid+1)%numprocs, 0, MPI_COMM_WORLD);
+		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-1, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		data[0] = data[0] * mult;
+		data[1]= data[1] +1;
+		if(data[1] == POWER){
+			printf("The total is %d after %d iterations.\n", data[0], data[1]);
+		}	
+		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+1)%numprocs, 0, MPI_COMM_WORLD);
 	}
 	}	
-
-	//Print this out last so it doesn't get mixed with the output from the other procs.
-	if(myid == 0){
-
-		printf("The total is %d after %d iterations.\n", data[0], data[1]);
-		
-	}
-	MPI_Finalize();
-
+MPI_Finalize();	
 return 0;
 }
 
