@@ -55,11 +55,9 @@ else{
 	
 	if(myid < mid){
 		data[0] = data[0] * data[0];
-		printf("I'm %d, sending to %d(mid is %d)\n",myid, myid+mid,mid);
 		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid), 0, MPI_COMM_WORLD);
 	}
 	else{
-		printf("0I'm %d, Recieving from %d\n",myid, myid-mid);
 		
 		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}
@@ -69,12 +67,10 @@ else{
 	int mid2 = (numprocs-mid)/2;
 	if(myid >= mid && myid < mid+mid2){
 		data[0] = data[0] * data[0];
-		printf("I'm %d, sending to %d\n--",myid, myid+mid2);
 		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid2), 0, MPI_COMM_WORLD);
 	}
 	else if(myid >= mid){
 		
-		printf("1I'm %d, recieving from %d\n",myid, myid-mid2);
 		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid2, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}	
 
@@ -82,11 +78,9 @@ else{
 	int mid3 = (numprocs-mid-mid2)/2;
 	if(myid >= mid + mid2 && myid < mid+mid2+mid3){
 		data[0] = data[0] * data[0];
-		printf("I'm %d, sending to %d\n---",myid, myid+mid3);
 		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid3), 0, MPI_COMM_WORLD);
 	}
 	else if(myid >= mid + mid2){
-		printf("2I'm %d, recieving from %d\n",myid, myid-mid3);
 		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid3, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}
 
