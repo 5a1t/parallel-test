@@ -4,7 +4,7 @@
 #include<stdlib.h>
 #include <string.h>
 
-#define PIPELINE 1
+#define PIPELINE 0
 #define POWER 16
 
 int main(int argc, char **argv)
@@ -47,7 +47,7 @@ if(PIPELINE == 1){
 }
 //divide and conquer method.
 else{
-	if(mid == 0){
+	if(myid == 0){
 		MPI_Bcast(data, 2, MPI_LONG_LONG_INT, 0, MPI_COMM_WORLD);
 	}
 	
@@ -55,31 +55,39 @@ else{
 	
 	if(myid < mid){
 		data[0] = data[0] * data[0];
+		printf("I'm %d, sending to %d(mid is %d)\n",myid, myid+mid,mid);
 		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid), 0, MPI_COMM_WORLD);
 	}
 	else{
+		printf("0I'm %d, Recieving from %d\n",myid, myid-mid);
+		
 		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	int mid2 = (numprocs-mid)/2
+	int mid2 = (numprocs-mid)/2;
 	if(myid >= mid && myid < mid+mid2){
 		data[0] = data[0] * data[0];
+		printf("I'm %d, sending to %d\n--",myid, myid+mid2);
 		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid2), 0, MPI_COMM_WORLD);
 	}
 	else if(myid >= mid){
+		
+		printf("1I'm %d, recieving from %d\n",myid, myid-mid2);
 		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid2, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}	
 
 	MPI_Barrier(MPI_COMM_WORLD);
-	int mid3 = (numprocs-mid-mid2)/2
+	int mid3 = (numprocs-mid-mid2)/2;
 	if(myid >= mid + mid2 && myid < mid+mid2+mid3){
 		data[0] = data[0] * data[0];
-		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid2+mid3), 0, MPI_COMM_WORLD);
+		printf("I'm %d, sending to %d\n---",myid, myid+mid3);
+		MPI_Send(data, 2, MPI_LONG_LONG_INT, (myid+mid3), 0, MPI_COMM_WORLD);
 	}
 	else if(myid >= mid + mid2){
-		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid2-mid3, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		printf("2I'm %d, recieving from %d\n",myid, myid-mid3);
+		MPI_Recv(data, 2, MPI_LONG_LONG_INT, myid-mid3, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}
 
 	if(myid == numprocs - 1){

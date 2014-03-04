@@ -1,4 +1,4 @@
 #!/bin/bash
 
 mpicc pipe.c -o pipe
-mpirun -np 17 ./pipe 2
+mpirun -np 16 ./pipe 2
